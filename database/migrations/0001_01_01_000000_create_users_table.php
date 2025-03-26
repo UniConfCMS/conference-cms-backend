@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('login');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table ->enum('role' ,['super_admin','admin','editor','user']);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -35,6 +36,14 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('temp_credentials', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->string('temp_password'); // Только временный пароль
+            $table->timestamp('expires_at');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -45,5 +54,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('temp_credentials');
     }
 };
