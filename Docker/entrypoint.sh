@@ -2,7 +2,7 @@
 
 mysql -hdb -uroot -proot -e "CREATE DATABASE IF NOT EXISTS laravel;"
 
-yes | php artisan migrate --seed
+yes | php artisan migrate:fresh --seed
 
 # Start the Laravel development server, accessible from any IP
 php artisan serve --host 0.0.0.0
