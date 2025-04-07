@@ -33,12 +33,7 @@ class UserSeeder extends Seeder
             'role' => 'editor',
         ]);
 
-        User::create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password123'),
-            'role' => 'user',
-        ]);
+    
     }
 }
 

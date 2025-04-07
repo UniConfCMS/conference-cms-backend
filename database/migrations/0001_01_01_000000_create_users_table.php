@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table ->enum('role' ,['super_admin','admin','editor','user']);
+            $table ->enum('role' ,['super_admin','admin','editor']);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -41,7 +41,7 @@ return new class extends Migration
         Schema::create('temp_credentials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->string('temp_password'); // Только временный пароль
+            $table->string('temp_password');
             $table->timestamp('expires_at');
             $table->timestamps();
         });
