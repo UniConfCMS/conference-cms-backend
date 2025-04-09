@@ -21,97 +21,6 @@ class AdminController extends Controller
         }
     }
 
-    public function index(Request $request)
-    {
-        $this->checkAdmin($request);
-        $users = User::all();
-        return response()->json($users);
-    }
-
-    public function store(Request $request)
-    {
-        $this->checkAdmin($request);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:editor',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
-        return response()->json(['message' => 'User created successfully', 'user' => $user], Response::HTTP_CREATED);
-    }
-
-    public function show(Request $request, $id)
-    {
-        $this->checkAdmin($request);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        return response()->json($user);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $this->checkAdmin($request);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($user->role === 'super_admin' || ($user->role === 'admin' && $user->id !== $request->user()->id)) {
-            return response()->json(['message' => 'Cannot edit super_admin or other admin users'], Response::HTTP_FORBIDDEN);
-        }
-
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $id,
-            'password' => 'sometimes|string|min:8|confirmed',
-            'role' => 'sometimes|in:editor',
-        ]);
-
-        $user->update([
-            'name' => $request->name ?? $user->name,
-            'email' => $request->email ?? $user->email,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-            'role' => $request->role ?? $user->role,
-        ]);
-
-        return response()->json(['message' => 'User updated successfully', 'user' => $user]);
-    }
-
-    public function destroy(Request $request, $id)
-    {
-        $this->checkAdmin($request);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($user->role === 'super_admin' || ($user->role === 'admin' && $user->id !== $request->user()->id)) {
-            return response()->json(['message' => 'Cannot delete super_admin or other admin users'], Response::HTTP_FORBIDDEN);
-        }
-
-        $user->delete();
-
-        return response()->json(['message' => 'User deleted successfully']);
-    }
-
     public function assignRole(Request $request, $id)
     {
         $this->checkAdmin($request);
@@ -139,11 +48,11 @@ class AdminController extends Controller
     public function getAllConferences(Request $request)
     {
         $this->checkAdmin($request);
-    
+
         $conferences = Conference::all();
         return response()->json($conferences);
     }
-    
+
 
     public function createConference(Request $request)
     {
@@ -188,7 +97,7 @@ class AdminController extends Controller
             'year' => 'sometimes|integer|unique:conferences,year,' . $id,
         ]);
 
-        
+
         $conference->title = $request->title ?? $conference->title;
         $conference->year = $request->year ?? $conference->year;
 
@@ -232,9 +141,9 @@ class AdminController extends Controller
     public function getPagesByConference(Request $request, $conference_id)
     {
         $this->checkAdmin($request);
-        
+
         $conference = Conference::find($conference_id);
-        
+
         if (!$conference) {
             return response()->json(['message' => 'Conference not found'], Response::HTTP_NOT_FOUND);
         }
@@ -254,15 +163,15 @@ class AdminController extends Controller
             'slug' => 'nullable|string|unique:pages,slug,NULL,id,conference_id,' . $request->conference_id,
             'content' => 'required|string',
         ]);
-    
-        
+
+
         $slug = $request->slug ?? Str::slug($request->title);
-    
-        
+
+
         $page = Page::create([
             'conference_id' => $request->conference_id,
             'title' => $request->title,
-            'slug' => $slug,  
+            'slug' => $slug,
             'content' => $request->content,
             'created_by' => $request->user()->id,
         ]);
@@ -274,14 +183,14 @@ class AdminController extends Controller
     {
         $this->checkAdmin($request);
 
-        
+
         $page = Page::findOrFail($id);
 
         if ($page->conference_id != $conference_id) {
             return response()->json(['message' => 'Page does not belong to this conference'], Response::HTTP_FORBIDDEN);
         }
 
-        
+
         $page->delete();
 
         return response()->json(['message' => 'Page deleted']);
