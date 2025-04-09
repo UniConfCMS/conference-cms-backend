@@ -1,5 +1,5 @@
 # Use the official Composer image version 2.2.25 as the base image
-FROM composer:2.2.25  
+FROM composer:2.2.25
 
 # Set the working directory inside the container
 WORKDIR /conference-cms-backend  
@@ -15,6 +15,8 @@ RUN chmod +x Docker/entrypoint.sh
 
 # Expose port 8000 for the application
 EXPOSE 8000  
+
+RUN composer install
 
 # Define the container startup script
 ENTRYPOINT ["Docker/entrypoint.sh"]
