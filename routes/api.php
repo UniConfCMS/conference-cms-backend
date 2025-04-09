@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function (){
 //Reset password routes
 Route::post('/password/reset/send', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
+//Link from the mail
+Route::get('/password/reset/{token}', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
 
 Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::get('/users', [SuperAdminController::class, 'index']);
