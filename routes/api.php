@@ -7,6 +7,7 @@ use App\Http\Controllers\api\PageController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PasswordResetController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -15,6 +16,12 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::get('/me', [AuthController::class,'me']);
     Route::post('/logout', [AuthController::class,'logout']);
 });
+
+//Reset password routes
+Route::post('/password/reset/send', [PasswordResetController::class, 'sendResetLink']);
+Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
+//Link from the mail
+Route::get('/password/reset/{token}', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
 
 Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::get('/users', [SuperAdminController::class, 'index']);
@@ -57,4 +64,3 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
      Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
      Route::put('/conferences/{conference_id}/pages/{id}', [PageController::class, 'updatePageContent']);
 });
-
