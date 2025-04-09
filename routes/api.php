@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\api\SuperAdminController;
-use App\Http\Controllers\api\AdminController;
+use App\Http\Controllers\api\ConferenceController;
+use App\Http\Controllers\api\EditorController;
+use App\Http\Controllers\api\PageController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -23,32 +25,36 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::patch('/users/{id}/assign-role', [SuperAdminController::class, 'assignRole']);
 });
 
-Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
-    // --- Conferences ---
-    Route::get('/conferences', [AdminController::class, 'getAllConferences']);
-    Route::post('/conferences', [AdminController::class, 'createConference']);
-    Route::put('/conferences/{id}', [AdminController::class, 'updateConference']);
-    Route::delete('/conferences/{id}', [AdminController::class, 'deleteConference']);
-
-    // --- Editors ---
-    Route::post('/editors/assign', [AdminController::class, 'assignEditor']);
-    Route::delete('/editors/{id}', [AdminController::class, 'deleteEditor']);
-
-    // --- Pages ---
-    Route::get('/conferences/{conference_id}/pages', [AdminController::class, 'getPagesByConference']);
-    Route::post('/conferences/{conferenceId}/pages', [AdminController::class, 'createPage']);
-    Route::delete('/conferences/{conference_id}/pages/{id}', [AdminController::class, 'deletePage']);
-    Route::put('/conferences/{conference_id}/pages/{id}', [AdminController::class, 'updatePageContent']);
-});
 
 //Routes for user managment
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+
+    // --- Users ---
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::patch('/users/{id}/assign-role', [UserController::class, 'assignRole']);
+
+
+    Route::post('/editors/assign', [EditorController::class, 'assignEditor']);
+    Route::delete('/editors/{id}', [EditorController::class, 'deleteEditor']);
+    Route::get('/conferences/{conference_id}/editors', [EditorController::class, 'getEditorsByConference']);
+    
+
+     // --- Conferences ---
+     Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
+     Route::post('/conferences', [ConferenceController::class, 'createConference']);
+     Route::put('/conferences/{id}', [ConferenceController::class, 'updateConference']);
+     Route::delete('/conferences/{id}', [ConferenceController::class, 'deleteConference']);
+ 
+ 
+     // --- Pages ---
+     Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
+     Route::post('/conferences/{conferenceId}/pages', [PageController::class, 'createPage']);
+     Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
+     Route::put('/conferences/{conference_id}/pages/{id}', [PageController::class, 'updatePageContent']);
 });
 

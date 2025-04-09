@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Editor;
 use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
@@ -22,6 +23,20 @@ class UserController extends Controller
         $users = User::all();
         return response()->json($users);
     }
+
+    public function show(Request $request, $id)
+    {
+        $this->checkAdmin($request);
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($user);
+    }
+
 
     public function store(Request $request)
     {
@@ -117,4 +132,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User role updated successfully', 'user' => $user]);
     }
+
+
 }
