@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::patch('/users/{id}/assign-role', [SuperAdminController::class, 'assignRole']);
 });
 
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     // --- Conferences ---
     Route::get('/conferences', [AdminController::class, 'getAllConferences']);
