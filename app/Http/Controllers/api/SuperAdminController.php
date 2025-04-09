@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Hash;
 
 class SuperAdminController extends Controller
 {
+    private function checkSAdmin(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
+        }
+    }
+
     public function index(Request $request)
     {
-        if ($request->user()->role !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
+        $this->checkSAdmin($request);
 
         $users = User::all();
         return response()->json($users);
@@ -45,9 +50,7 @@ class SuperAdminController extends Controller
 
     public function show(Request $request, $id)
     {
-        if ($request->user()->role !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
+        $this->checkSAdmin($request);
 
         $user = User::find($id);
 
@@ -60,9 +63,7 @@ class SuperAdminController extends Controller
 
     public function update(Request $request, $id)
     {
-        if ($request->user()->role !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
+        $this->checkSAdmin($request);
 
         $user = User::find($id);
 
@@ -89,9 +90,7 @@ class SuperAdminController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        if ($request->user()->role !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
+        $this->checkSAdmin($request);
 
         $user = User::find($id);
 
@@ -106,9 +105,7 @@ class SuperAdminController extends Controller
 
     public function assignRole(Request $request, $id)
     {
-        if ($request->user()->role !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
+        $this->checkSAdmin($request);
 
         $user = User::find($id);
 

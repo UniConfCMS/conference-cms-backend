@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\SuperAdminController;
+use App\Http\Controllers\api\AdminController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,30 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::put('/users/{id}', [SuperAdminController::class, 'update']);
     Route::delete('/users/{id}', [SuperAdminController::class, 'destroy']);
     Route::patch('/users/{id}/assign-role', [SuperAdminController::class, 'assignRole']);
+});
+
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    // --- Users ---
+    Route::get('/users', [AdminController::class, 'index']);
+    Route::post('/users', [AdminController::class, 'store']);
+    Route::get('/users/{id}', [AdminController::class, 'show']);
+    Route::put('/users/{id}', [AdminController::class, 'update']);
+    Route::delete('/users/{id}', [AdminController::class, 'destroy']);
+    Route::patch('/users/{id}/assign-role', [AdminController::class, 'assignRole']);
+
+    // --- Conferences ---
+    Route::get('/conferences', [AdminController::class, 'getAllConferences']);
+    Route::post('/conferences', [AdminController::class, 'createConference']);
+    Route::put('/conferences/{id}', [AdminController::class, 'updateConference']);
+    Route::delete('/conferences/{id}', [AdminController::class, 'deleteConference']);
+
+    // --- Editors ---
+    Route::post('/editors/assign', [AdminController::class, 'assignEditor']);
+    Route::delete('/editors/{id}', [AdminController::class, 'deleteEditor']);
+
+    // --- Pages ---
+    Route::get('/conferences/{conference_id}/pages', [AdminController::class, 'getPagesByConference']);
+    Route::post('/conferences/{conferenceId}/pages', [AdminController::class, 'createPage']);
+    Route::delete('/conferences/{conference_id}/pages/{id}', [AdminController::class, 'deletePage']);
+    Route::put('/conferences/{conference_id}/pages/{id}', [AdminController::class, 'updatePageContent']);
 });
