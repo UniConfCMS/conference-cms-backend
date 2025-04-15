@@ -31,28 +31,28 @@ class AuthController extends Controller
             'token'=>$token,
         ]);
     }
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email'=>'required|email|unique:users,email',
-            'password'=>'required|confirmed',
-        ]);
-
-        $user = User::create([
-           'name' =>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password),
-        ]);
-
-        $token = $user->createToken('auth-token')->plainTextToken;
-
-        return response()->json([
-            'user'=>$user,
-            'token'=>$token
-        ], 201);
-
-    }
+//    public function register(Request $request)
+//    {
+//        $request->validate([
+//            'name' => 'required|string|max:255',
+//            'email'=>'required|email|unique:users,email',
+//            'password'=>'required|confirmed',
+//        ]);
+//
+//        $user = User::create([
+//           'name' =>$request->name,
+//            'email'=>$request->email,
+//            'password'=>Hash::make($request->password),
+//        ]);
+//
+//        $token = $user->createToken('auth-token')->plainTextToken;
+//
+//        return response()->json([
+//            'user'=>$user,
+//            'token'=>$token
+//        ], 201);
+//
+//    }
 
     public function me(Request$request)
     {

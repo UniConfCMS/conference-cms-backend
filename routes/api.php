@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordResetController;
 
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
 //protected routes
 Route::middleware('auth:sanctum')->group(function (){
     Route::get('/me', [AuthController::class,'me']);
@@ -49,15 +48,15 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/editors/assign', [EditorController::class, 'assignEditor']);
     Route::delete('/editors/{id}', [EditorController::class, 'deleteEditor']);
     Route::get('/conferences/{conference_id}/editors', [EditorController::class, 'getEditorsByConference']);
-    
+
 
      // --- Conferences ---
      Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
      Route::post('/conferences', [ConferenceController::class, 'createConference']);
      Route::put('/conferences/{id}', [ConferenceController::class, 'updateConference']);
      Route::delete('/conferences/{id}', [ConferenceController::class, 'deleteConference']);
- 
- 
+
+
      // --- Pages ---
      Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
      Route::post('/conferences/{conferenceId}/pages', [PageController::class, 'createPage']);
