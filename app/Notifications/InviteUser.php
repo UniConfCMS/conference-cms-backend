@@ -46,7 +46,7 @@ class InviteUser extends Notification
 
         return (new MailMessage)
             ->subject('Invite - 8Conference')
-            ->view('emails.InviteUser', [
+            ->view('emails.invite', [
                 'url' => $url,
                 'notifiable'=>$notifiable,
                 'role'=>$this->role

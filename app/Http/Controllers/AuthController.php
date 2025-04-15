@@ -66,7 +66,7 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'email'=>'required|mail',
+            'email'=>'required|email',
             'password'=>'required|string|min:8|confirmed'
         ]);
 
@@ -75,7 +75,7 @@ class AuthController extends Controller
             return response()->json(['message', 'User not found'], 404);
         }
 
-        $user->password(Hash::make($request->password));
+        $user->password = Hash::make($request->password);
         $user->save();
 
         $token = $user->createToken('auth-token')->plainTextToken;
