@@ -22,7 +22,7 @@ Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']
 //Link from the mail
 Route::get('/password/reset/{token}', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
 
-Route::get('/set-password', [AuthController::class, 'showSetPasswordForm'])->name('set-password');
+Route::get('/set-password', [AuthController::class, 'showSetPasswordForm'])->name('set_password');
 Route::post('/set-password', [AuthController::class, 'setPassword']);
 
 Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
