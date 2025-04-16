@@ -31,28 +31,6 @@ class AuthController extends Controller
             'token'=>$token,
         ]);
     }
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email'=>'required|email|unique:users,email',
-            'password'=>'required|confirmed',
-        ]);
-
-        $user = User::create([
-           'name' =>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password),
-        ]);
-
-        $token = $user->createToken('auth-token')->plainTextToken;
-
-        return response()->json([
-            'user'=>$user,
-            'token'=>$token
-        ], 201);
-
-    }
 
     public function me(Request$request)
     {
@@ -65,4 +43,47 @@ class AuthController extends Controller
         return response()->json(['message'=>'Logged out']);
     }
 
+    public function showSetPasswordForm(Request $request)
+    {
+        if(!$request->hasValidSignature()){
+            return response()->json(['message'=>'Invalid or expired link'],403);
+        }
+
+        $email = $request->query('email');
+        $user = User::where('email', $email)->first();
+
+        if(!$user){
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['email'=>$email]);
+    }
+
+    public function setPassword(Request $request)
+    {
+        if(!$request->hasValidSignature()){
+            return response()->json(['message'=>'Invalid or expired link'],403);
+        }
+
+        $request->validate([
+            'email'=>'required|email',
+            'password'=>'required|string|min:8|confirmed'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if(!$user){
+            return response()->json(['message', 'User not found'], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Password set successfully',
+            'user' => $user,
+            'token' => $token,
+        ]);
+    }
 }
