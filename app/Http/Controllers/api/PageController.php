@@ -11,16 +11,16 @@ use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
-    private function checkAdmin(Request $request)
+    private function checkPermission(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
+        if ($request->user()->role !== 'admin' && $request->user()->role !== 'editor') {
             abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
         }
     }
 
     public function getPagesByConference(Request $request, $conference_id)
     {
-        $this->checkAdmin($request);
+        $this->checkPermission($request);
 
         $conference = Conference::find($conference_id);
 
@@ -34,7 +34,7 @@ class PageController extends Controller
 
     public function createPage(Request $request)
     {
-        $this->checkAdmin($request);
+        $this->checkPermission($request);
 
         $request->validate([
             'conference_id' => 'required|exists:conferences,id',
@@ -58,7 +58,7 @@ class PageController extends Controller
 
     public function deletePage(Request $request, $conference_id, $id)
     {
-        $this->checkAdmin($request);
+        $this->checkPermission($request);
 
         $page = Page::findOrFail($id);
 
@@ -73,7 +73,7 @@ class PageController extends Controller
 
     public function updatePageContent(Request $request, $conferenceId, $id)
     {
-        $this->checkAdmin($request);
+        $this->checkPermission($request);
 
         $request->validate([
             'title' => 'sometimes|string|max:255',
