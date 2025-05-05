@@ -66,7 +66,7 @@ class EditorController extends Controller
 
         return response()->json(['message' => 'Editor deleted successfully']);
     }
-// Отримати редакторів для конференції
+
     public function getEditorsByConference(Request $request, $conference_id)
     {
         $this->checkAdmin($request);

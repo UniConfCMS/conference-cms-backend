@@ -16,6 +16,7 @@ class PageController extends Controller
         if ($request->user()->role !== 'admin') {
             abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
         }
+        
     }
 
     public function getPagesByConference(Request $request, $conference_id)
