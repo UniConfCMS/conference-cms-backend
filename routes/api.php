@@ -35,6 +35,8 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::patch('/users/{id}/assign-role', [SuperAdminController::class, 'assignRole']);
 });
 
+Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
+Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
 
 
 //Routes for user managment
@@ -55,14 +57,13 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
 
      // --- Conferences ---
-     Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
+   
      Route::post('/conferences', [ConferenceController::class, 'createConference']);
      Route::put('/conferences/{id}', [ConferenceController::class, 'updateConference']);
      Route::delete('/conferences/{id}', [ConferenceController::class, 'deleteConference']);
 
 
      // --- Pages ---
-    Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
     Route::post('/conferences/{conference_id}/pages', [PageController::class, 'createPage']);
     Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
     Route::patch('/conferences/{conference_id}/pages/{id}/content', [PageController::class, 'updatePageContent']);
