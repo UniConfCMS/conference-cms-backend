@@ -4,6 +4,7 @@ use App\Http\Controllers\api\SuperAdminController;
 use App\Http\Controllers\api\ConferenceController;
 use App\Http\Controllers\api\EditorController;
 use App\Http\Controllers\api\PageController;
+use App\Http\Controllers\api\FileController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -61,8 +62,13 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
 
      // --- Pages ---
-     Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
-     Route::post('/conferences/{conferenceId}/pages', [PageController::class, 'createPage']);
-     Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
-     Route::put('/conferences/{conference_id}/pages/{id}', [PageController::class, 'updatePageContent']);
+    Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
+    Route::post('/conferences/{conference_id}/pages', [PageController::class, 'createPage']);
+    Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
+    Route::patch('/conferences/{conference_id}/pages/{id}/content', [PageController::class, 'updatePageContent']);
+    
+    // --- Files ---
+    Route::post('/conferences/{conference_id}/pages/{page_id}/files', [FileController::class, 'uploadFile']);
+    Route::delete('/conferences/{conference_id}/pages/{page_id}/files/{file_id}', [FileController::class, 'deleteFile']);
+    Route::get('/conferences/{conference_id}/pages/{page_id}/files', [FileController::class, 'getFilesByPage']);
 });
