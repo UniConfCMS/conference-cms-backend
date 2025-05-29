@@ -18,7 +18,7 @@ class ConferenceController extends Controller
 
     public function getAllConferences(Request $request)
     {
-        $this->checkAdmin($request);
+        
         $conferences = Conference::all();
         return response()->json($conferences);
     }

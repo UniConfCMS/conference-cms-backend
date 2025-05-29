@@ -22,8 +22,7 @@ class PageController extends Controller
 
     public function getPagesByConference(Request $request, $conference_id)
     {
-        $this->checkPermission($request);
-
+      
         $conference = Conference::find($conference_id);
 
         if (!$conference) {
