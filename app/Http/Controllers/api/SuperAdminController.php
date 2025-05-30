@@ -108,15 +108,16 @@ class SuperAdminController extends Controller
     public function assignRole(Request $request, $id)
     {
         $this->checkSAdmin($request);
-
         $user = User::find($id);
-
         if (!$user) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
+        if ($user->id === $request->user()->id) {
+            return response()->json(['message' => 'Cannot change own role'], Response::HTTP_FORBIDDEN);
+        }
 
         $request->validate([
-            'role' => 'required|in:admin',
+            'role' => 'required|in:admin,super_admin,editor',
         ]);
 
         $user->role = $request->role;
