@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conference_id')->constrained('conferences');
-            $table->string('title');
-            $table->string('slug')->unique();
+            $table->string('title')->unique(); // Unique title for each page
             $table->text('content'); // Saves data  from the WYSIWYG editor
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();

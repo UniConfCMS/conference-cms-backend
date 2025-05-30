@@ -18,39 +18,25 @@ class FileController extends Controller
         }
     }
 
-    public function uploadFile(Request $request, $conference_id, $page_id)
+    public function uploadFile(Request $request)
     {
         $this->checkPermission($request);
         
         $request->validate([
-            'files.*' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,docx|max:10240', // max 10MB
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,docx|max:10240', // max 10MB
         ]);
 
-        $page = Page::findOrFail($page_id);
-        if ($page->conference_id != $conference_id) {
-            return response()->json(['message' => 'Page does not belong to this conference'], Response::HTTP_FORBIDDEN);
-        }
-
-        $urls = [];
-        $files = $request->file('files', []);
+        $file = $request->file('file', null);
         
-        foreach ($files as $file) {
-            $path = $file->store('files', 'public');
-            $fileRecord = File::create([
-                'page_id' => $page_id,
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'uploaded_by' => $request->user()->id,
-            ]);
-            $urls[] = Storage::url($path);
-        }
+        $path = $file->store('file', 'public');
+        File::create([
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'uploaded_by' => $request->user()->id,
+        ]);
+        $url = Storage::url($path);
 
-        // If uploading one file, return { location: "url" } for TinyMCE
-        if (count($urls) === 1) {
-            return response()->json(['location' => $urls[0]], Response::HTTP_CREATED);
-        }
-
-        return response()->json(['locations' => $urls], Response::HTTP_CREATED);
+        return response()->json(['locations' => $url], Response::HTTP_CREATED);
     }
 
     public function deleteFile(Request $request, $conference_id, $page_id, $file_id)
@@ -66,25 +52,5 @@ class FileController extends Controller
         $file->delete();
         
         return response()->json(['message' => 'File deleted'], Response::HTTP_OK);
-    }
-
-    public function getFilesByPage(Request $request, $conference_id, $page_id)
-    {
-        $this->checkPermission($request);
-        
-        $page = Page::findOrFail($page_id);
-        if ($page->conference_id != $conference_id) {
-            return response()->json(['message' => 'Page does not belong to this conference'], Response::HTTP_FORBIDDEN);
-        }
-        
-        $files = $page->files->map(function ($file) {
-            return [
-                'id' => $file->id,
-                'name' => $file->file_name,
-                'url' => Storage::url($file->file_path),
-            ];
-        });
-        
-        return response()->json($files, Response::HTTP_OK);
     }
 }

@@ -69,7 +69,6 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::patch('/conferences/{conference_id}/pages/{id}/content', [PageController::class, 'updatePageContent']);
     
     // --- Files ---
-    Route::post('/conferences/{conference_id}/pages/{page_id}/files', [FileController::class, 'uploadFile']);
+    Route::post('/conferences/files', [FileController::class, 'uploadFile']);
     Route::delete('/conferences/{conference_id}/pages/{page_id}/files/{file_id}', [FileController::class, 'deleteFile']);
-    Route::get('/conferences/{conference_id}/pages/{page_id}/files', [FileController::class, 'getFilesByPage']);
 });
