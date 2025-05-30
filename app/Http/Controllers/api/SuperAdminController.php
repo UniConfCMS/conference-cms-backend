@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\InviteUser;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +29,7 @@ class SuperAdminController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('SuperAdmin store request:', $request->all());
         if ($request->user()->role !== 'super_admin') {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }

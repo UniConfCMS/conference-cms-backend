@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -45,34 +46,65 @@ class AuthController extends Controller
 
     public function showSetPasswordForm(Request $request)
     {
-        if(!$request->hasValidSignature()){
-            return response()->json(['message'=>'Invalid or expired link'],403);
+        $email = $request->query('email');
+        $expires = $request->query('expires');
+        $signature = $request->query('signature');
+
+        Log::info('SetPassword GET params:', $request->query());
+
+        // Проверяем подпись
+        $expectedSignature = hash_hmac('sha256', http_build_query([
+            'email' => urldecode($email),
+            'expires' => $expires,
+        ], '', '&', PHP_QUERY_RFC3986), config('app.key'));
+
+        if (!hash_equals($expectedSignature, $signature) || $expires < now()->timestamp) {
+            Log::warning('Invalid or expired signature for set-password GET', [
+                'expected' => $expectedSignature,
+                'received' => $signature,
+            ]);
+            return response()->json(['message' => 'Invalid or expired link'], 403);
         }
 
-        $email = $request->query('email');
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', urldecode($email))->first();
 
-        if(!$user){
+        if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        return response()->json(['email'=>$email]);
+        return response()->json(['email' => urldecode($email)]);
     }
 
     public function setPassword(Request $request)
     {
-        if(!$request->hasValidSignature()){
-            return response()->json(['message'=>'Invalid or expired link'],403);
+        $email = $request->input('email');
+        $expires = $request->input('expires');
+        $signature = $request->input('signature');
+
+        Log::info('SetPassword POST params:', $request->all());
+
+        // Проверяем подпись
+        $expectedSignature = hash_hmac('sha256', http_build_query([
+            'email' => $email,
+            'expires' => $expires,
+        ], '', '&', PHP_QUERY_RFC3986), config('app.key'));
+
+        if (!hash_equals($expectedSignature, $signature) || $expires < now()->timestamp) {
+            Log::warning('Invalid or expired signature for set-password POST', [
+                'expected' => $expectedSignature,
+                'received' => $signature,
+            ]);
+            return response()->json(['message' => 'Invalid or expired link'], 403);
         }
 
         $request->validate([
-            'email'=>'required|email',
-            'password'=>'required|string|min:8|confirmed'
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed'
         ]);
 
-        $user = User::where('email', $request->email)->first();
-        if(!$user){
-            return response()->json(['message', 'User not found'], 404);
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         $user->password = Hash::make($request->password);
