@@ -14,7 +14,7 @@ class SuperAdminController extends Controller
 {
     private function checkSAdmin(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
+        if ($request->user()->role !== 'super_admin') {
             abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
         }
     }

@@ -91,6 +91,12 @@ class UserController extends Controller
         return response()->json(['message' => 'User updated successfully', 'user' => $user]);
     }
 
+    public function deleteOwnAccount(Request $request)
+    {
+        $user = $request->user();
+        $user->delete();
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
     public function destroy(Request $request, $id)
     {
         $this->checkAdmin($request);
