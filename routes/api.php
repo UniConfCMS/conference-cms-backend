@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::get('/me', [AuthController::class,'me']);
     Route::post('/logout', [AuthController::class,'logout']);
     Route::delete('/user/delete', [UserController::class, 'deleteOwnAccount']);
+    Route::patch('/user/password', [UserController::class, 'changePassword']);
 });
 
 //Reset password routes
