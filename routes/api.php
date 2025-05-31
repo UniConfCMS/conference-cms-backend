@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
 });
 
 Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
+Route::get('/conferences/{id}', [ConferenceController::class, 'getConference']);
+
 Route::get('/conferences/{conference_id}/pages', [PageController::class, 'getPagesByConference']);
 
 
