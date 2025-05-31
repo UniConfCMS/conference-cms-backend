@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('editors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('conference_id')->constrained('conferences'); // Привязка к конкретной конференции
+            $table->foreignId('conference_id')->constrained('conferences')->onDelete('cascade');
             $table->foreignId('assigned_by')->constrained('users');
             $table->timestamps();
         });

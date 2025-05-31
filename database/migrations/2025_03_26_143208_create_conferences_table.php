@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('conferences', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->year('year')->unique(); // unique year for the conference
+            $table->string('title')->unique();
+            $table->year('year');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });

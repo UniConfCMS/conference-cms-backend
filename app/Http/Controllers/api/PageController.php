@@ -7,7 +7,6 @@ use App\Models\Page;
 use App\Models\Conference;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use HTMLPurifier;
 use HTMLPurifier_Config;
 
@@ -22,7 +21,6 @@ class PageController extends Controller
 
     public function getPagesByConference(Request $request, $conference_id)
     {
-      
         $conference = Conference::find($conference_id);
 
         if (!$conference) {
@@ -38,11 +36,11 @@ class PageController extends Controller
         $this->checkPermission($request);
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:pages,slug,null,id,conference_id,' . $conference_id,
             'content' => 'required|string',
         ]);
 
         $config = HTMLPurifier_Config::createDefault();
+        $config->set('HTML.AllowedAttributes', 'img.src');
         $purifier = new HTMLPurifier($config);
         $data['content'] = $purifier->purify($data['content']);
 
@@ -75,9 +73,8 @@ class PageController extends Controller
             return response()->json(['message' => 'Page does not belong to this conference'], Response::HTTP_FORBIDDEN);
         }
         $data = $request->validate([
-            'content' => 'required|string', // support HTML from CKEditor 5
+            'content' => 'required|string',
             'title' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|nullable|string|unique:pages,slug,' . $id . ',id,conference_id,' . $conference_id,
         ]);
 
         $config = HTMLPurifier_Config::createDefault();

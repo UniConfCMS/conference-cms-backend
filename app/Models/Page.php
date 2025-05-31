@@ -9,7 +9,7 @@ class Page extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['conference_id', 'title', 'slug', 'content', 'created_by'];
+    protected $fillable = ['conference_id', 'title', 'content', 'created_by'];
 
     public function conference()
     {

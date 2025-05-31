@@ -11,14 +11,17 @@ class ConferenceController extends Controller
 {
     private function checkAdmin(Request $request)
     {
+        if (!$request->user()) {
+            abort(Response::HTTP_UNAUTHORIZED, 'Authentication required');
+        }
+
         if ($request->user()->role !== 'admin') {
-            abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
+            abort(Response::HTTP_FORBIDDEN, 'Admin access required');
         }
     }
 
     public function getAllConferences(Request $request)
     {
-        
         $conferences = Conference::all();
         return response()->json($conferences);
     }
@@ -28,8 +31,8 @@ class ConferenceController extends Controller
         $this->checkAdmin($request);
 
         $request->validate([
-            'title' => 'required|string|max:255',
-            'year' => 'required|integer|unique:conferences,year',
+            'title' => 'required|string|max:255|unique:conferences,title',
+            'year' => 'required|integer',
         ]);
 
         $conference = Conference::create([
@@ -62,17 +65,29 @@ class ConferenceController extends Controller
         }
 
         $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'year' => 'sometimes|integer|unique:conferences,year,' . $id,
+            'title' => 'required|string|max:255|unique:conferences,title,' . $id,
+            'year' => 'required|integer',
         ]);
 
-        $conference->title = $request->title ?? $conference->title;
-        $conference->year = $request->year ?? $conference->year;
+        $conference->title = $request->title;
+        $conference->year = $request->year;
 
         $conference->save();
 
-        return response()->json(['message' => 'Conference updated successfully', 'conference' => $conference]);
+        return response()->json([
+            'message' => 'Conference updated successfully',
+            'conference' => $conference,
+        ]);
+    }
+    public function getConference(Request $request, $id)
+    {
+        $conference = Conference::find($id);
+
+        if (!$conference) {
+            return response()->json(['message' => 'Conference not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($conference);
     }
 
-  
 }
