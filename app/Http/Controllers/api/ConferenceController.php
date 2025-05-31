@@ -11,8 +11,12 @@ class ConferenceController extends Controller
 {
     private function checkAdmin(Request $request)
     {
+        if (!$request->user()) {
+            abort(Response::HTTP_UNAUTHORIZED, 'Authentication required');
+        }
+
         if ($request->user()->role !== 'admin') {
-            abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
+            abort(Response::HTTP_FORBIDDEN, 'Admin access required');
         }
     }
 
