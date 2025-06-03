@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Conference;
+use App\Models\Editor;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use HTMLPurifier;
@@ -12,11 +13,27 @@ use HTMLPurifier_Config;
 
 class PageController extends Controller
 {
-    private function checkPermission(Request $request)
+    private function checkPermission(Request $request, $conference_id)
     {
-        if ($request->user()->role !== 'admin' && $request->user()->role !== 'editor') {
-            abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
+        $user = $request->user();
+        
+        // Адмін має повний доступ
+        if ($user->role === 'admin') {
+            return true;
         }
+
+        // Перевірка, чи є користувач редактором для цієї конференції
+        if ($user->role === 'editor') {
+            $isEditor = Editor::where('user_id', $user->id)
+                             ->where('conference_id', $conference_id)
+                             ->exists();
+            if ($isEditor) {
+                return true;
+            }
+        }
+
+        // Якщо користувач не адмін і не редактор конференції, забороняємо доступ
+        abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
     }
 
     public function getPagesByConference(Request $request, $conference_id)
@@ -27,13 +44,18 @@ class PageController extends Controller
             return response()->json(['message' => 'Conference not found'], Response::HTTP_NOT_FOUND);
         }
 
+        
+        
+
         $pages = Page::where('conference_id', $conference_id)->get();
         return response()->json($pages);
     }
 
     public function createPage(Request $request, $conference_id)
     {
-        $this->checkPermission($request);
+        // Перевірка доступу
+        $this->checkPermission($request, $conference_id);
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -52,7 +74,8 @@ class PageController extends Controller
 
     public function deletePage(Request $request, $conference_id, $id)
     {
-        $this->checkPermission($request);
+        // Перевірка доступу
+        $this->checkPermission($request, $conference_id);
 
         $page = Page::findOrFail($id);
 
@@ -67,11 +90,14 @@ class PageController extends Controller
 
     public function updatePageContent(Request $request, $conference_id, $id)
     {
-        $this->checkPermission($request);
+        // Перевірка доступу
+        $this->checkPermission($request, $conference_id);
+
         $page = Page::findOrFail($id);
         if ($page->conference_id != $conference_id) {
             return response()->json(['message' => 'Page does not belong to this conference'], Response::HTTP_FORBIDDEN);
         }
+
         $data = $request->validate([
             'content' => 'required|string',
             'title' => 'sometimes|string|max:255',
@@ -84,4 +110,4 @@ class PageController extends Controller
         $page->update($data);
         return response()->json($page);
     }
-}
+} 

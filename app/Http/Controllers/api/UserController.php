@@ -150,6 +150,15 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User role updated successfully', 'user' => $user]);
     }
+   
+    public function getEditors(Request $request)
+    {
+        
+        $this->checkAdmin($request);
 
+        $editors = User::where('role', 'editor')->get(['id', 'name', 'email', 'role']);
+
+        return response()->json($editors);
+    }
 
 }

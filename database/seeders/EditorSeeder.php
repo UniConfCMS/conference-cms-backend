@@ -15,7 +15,7 @@ class EditorSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdmin = User::where('role', 'admin')->first();
+        $admin = User::where('role', 'admin')->first();
         $editor = User::where('role', 'editor')->first();
         $conferences = Conference::all();
 
@@ -23,7 +23,7 @@ class EditorSeeder extends Seeder
             Editor::create([
                 'user_id' => $editor->id,
                 'conference_id' => $conference->id,
-                'assigned_by' => $superAdmin->id,
+                'assigned_by' => $admin->id,
             ]);
         }
     }
