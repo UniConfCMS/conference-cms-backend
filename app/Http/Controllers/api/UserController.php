@@ -18,6 +18,25 @@ class UserController extends Controller
         }
     }
 
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json(['message' => 'Password changed successfully']);
+    }
+
     public function index(Request $request)
     {
         $this->checkAdmin($request);
@@ -62,35 +81,33 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->checkAdmin($request);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($user->role === 'super_admin' || ($user->role === 'admin' && $user->id !== $request->user()->id)) {
-            return response()->json(['message' => 'Cannot edit super_admin or other admin users'], Response::HTTP_FORBIDDEN);
+        $user = $request->user();
+        if ($id != $user->id) {
+            return response()->json(['message' => 'Can only update own profile'], Response::HTTP_FORBIDDEN);
         }
 
         $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
-            'password' => 'sometimes|string|min:8|confirmed',
             'role' => 'sometimes|in:editor',
         ]);
 
         $user->update([
             'name' => $request->name ?? $user->name,
             'email' => $request->email ?? $user->email,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
             'role' => $request->role ?? $user->role,
         ]);
 
-        return response()->json(['message' => 'User updated successfully', 'user' => $user]);
+        return response()->json(['message' => 'Profile updated successfully', 'user' => $user]);
     }
 
+
+    public function deleteOwnAccount(Request $request)
+    {
+        $user = $request->user();
+        $user->delete();
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
     public function destroy(Request $request, $id)
     {
         $this->checkAdmin($request);

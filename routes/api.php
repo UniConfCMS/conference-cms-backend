@@ -15,6 +15,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum')->group(function (){
     Route::get('/me', [AuthController::class,'me']);
     Route::post('/logout', [AuthController::class,'logout']);
+    Route::delete('/user/delete', [UserController::class, 'deleteOwnAccount']);
+    Route::patch('/user/password', [UserController::class, 'changePassword']);
 });
 
 //Reset password routes
@@ -59,7 +61,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
 
      // --- Conferences ---
-   
+
      Route::post('/conferences', [ConferenceController::class, 'createConference']);
      Route::put('/conferences/{id}', [ConferenceController::class, 'updateConference']);
      Route::delete('/conferences/{id}', [ConferenceController::class, 'deleteConference']);
@@ -69,7 +71,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/conferences/{conference_id}/pages', [PageController::class, 'createPage']);
     Route::delete('/conferences/{conference_id}/pages/{id}', [PageController::class, 'deletePage']);
     Route::patch('/conferences/{conference_id}/pages/{id}/content', [PageController::class, 'updatePageContent']);
-    
+
     // --- Files ---
     Route::post('/conferences/files', [FileController::class, 'uploadFile']);
     Route::delete('/conferences/{conference_id}/pages/{page_id}/files/{file_id}', [FileController::class, 'deleteFile']);
