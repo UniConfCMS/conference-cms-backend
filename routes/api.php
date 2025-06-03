@@ -17,6 +17,10 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::post('/logout', [AuthController::class,'logout']);
     Route::delete('/user/delete', [UserController::class, 'deleteOwnAccount']);
     Route::patch('/user/password', [UserController::class, 'changePassword']);
+
+    
+    Route::get('/editors/check/{conference_id}', [EditorController::class, 'checkEditorStatus']);
+    Route::get('/users/editors', [UserController::class, 'getEditors'])->name('users.editors');
 });
 
 //Reset password routes
@@ -36,6 +40,8 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::delete('/users/{id}', [SuperAdminController::class, 'destroy']);
     Route::patch('/users/{id}/assign-role', [SuperAdminController::class, 'assignRole']);
 });
+
+
 
 Route::get('/conferences', [ConferenceController::class, 'getAllConferences']);
 Route::get('/conferences/{id}', [ConferenceController::class, 'getConference']);

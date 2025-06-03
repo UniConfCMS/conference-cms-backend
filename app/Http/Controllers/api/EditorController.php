@@ -13,11 +13,11 @@ class EditorController extends Controller
 {
     private function checkAdmin(Request $request)
     {
-        if (!in_array($request->user()->role, ['admin', 'super_admin'])) {
+        if (!in_array($request->user()->role, ["admin"])) {
             abort(Response::HTTP_FORBIDDEN, 'Unauthorized');
         }
     }
-
+    
     
     public function assignEditor(Request $request)
     {
@@ -66,7 +66,7 @@ class EditorController extends Controller
 
         return response()->json(['message' => 'Editor deleted successfully']);
     }
-// Отримати редакторів для конференції
+
     public function getEditorsByConference(Request $request, $conference_id)
     {
         $this->checkAdmin($request);
@@ -74,9 +74,34 @@ class EditorController extends Controller
         $editors = Editor::with('user')
             ->where('conference_id', $conference_id)
             ->get()
-            ->pluck('user');
+            ->map(function ($editor) {
+                return [
+                    'editor_id' => $editor->id,
+                    'user' => $editor->user ? $editor->user->only(['id', 'name', 'email', 'role']) : null,
+                ];
+            })
+            ->filter(function ($editor) {
+                return !is_null($editor['user']);
+            })
+            ->values();
 
         return response()->json($editors);
+    }
+
+    public function checkEditorStatus(Request $request, $conference_id)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['isEditor' => false], Response::HTTP_UNAUTHORIZED);
+        }
+
+       
+        $isEditor = Editor::where('user_id', $user->id)
+                         ->where('conference_id', $conference_id)
+                         ->exists();
+
+        return response()->json(['isEditor' => $isEditor]);
     }
     
 }
