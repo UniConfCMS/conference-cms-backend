@@ -37,7 +37,7 @@ class SuperAdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,super_admin',
+            'role' => 'required|in:admin,editor',
         ]);
 
         $user = User::create([
@@ -77,7 +77,7 @@ class SuperAdminController extends Controller
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
             'password' => 'sometimes|string|min:8|confirmed',
-            'role' => 'sometimes|in:admin',
+            'role' => 'sometimes|in:admin,editor',
         ]);
 
         $user->update([
@@ -117,7 +117,7 @@ class SuperAdminController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|in:admin,super_admin,editor',
+            'role' => 'required|in:admin,editor',
         ]);
 
         $user->role = $request->role;
