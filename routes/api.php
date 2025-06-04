@@ -17,6 +17,7 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::post('/logout', [AuthController::class,'logout']);
     Route::delete('/user/delete', [UserController::class, 'deleteOwnAccount']);
     Route::patch('/user/password', [UserController::class, 'changePassword']);
+    Route::post('/users/{id}/profile-picture', [UserController::class, 'uploadProfilePicture']);
 
     
     Route::get('/editors/check/{conference_id}', [EditorController::class, 'checkEditorStatus']);

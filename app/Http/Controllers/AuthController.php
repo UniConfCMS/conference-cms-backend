@@ -26,16 +26,24 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
-
+        $data = $user->toArray();
+        $data['profilePicture'] = $user->profile_picture
+            ? url(\Storage::url($user->profile_picture))
+            : null;
         return response()->json([
-            'user'=>$user,
+            'user'=>$data,
             'token'=>$token,
         ]);
     }
 
-    public function me(Request$request)
+    public function me(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        $data = $user->toArray();
+        $data['profilePicture'] = $user->profile_picture
+            ? url(\Storage::url($user->profile_picture))
+            : null;
+        return response()->json($data);
     }
 
     public function logout(Request $request)
@@ -111,10 +119,13 @@ class AuthController extends Controller
         $user->save();
 
         $token = $user->createToken('auth-token')->plainTextToken;
-
+        $data = $user->toArray();
+        $data['profilePicture'] = $user->profile_picture
+            ? url(\Storage::url($user->profile_picture))
+            : null;
         return response()->json([
             'message' => 'Password set successfully',
-            'user' => $user,
+            'user' => $data,
             'token' => $token,
         ]);
     }

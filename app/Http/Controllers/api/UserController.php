@@ -8,6 +8,7 @@ use App\Notifications\InviteUser;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -159,6 +160,34 @@ class UserController extends Controller
         $editors = User::where('role', 'editor')->get(['id', 'name', 'email', 'role']);
 
         return response()->json($editors);
+    }
+
+    public function uploadProfilePicture(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($id != $user->id) {
+            return response()->json(['message' => 'Can only update own profile picture'], Response::HTTP_FORBIDDEN);
+        }
+
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // max 5MB
+        ]);
+
+        $file = $request->file('profile_picture');
+        $path = $file->store('file/profile-picture', 'public');
+        
+        // Delete old profile picture if exists
+        if ($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
+        }
+
+        $user->profile_picture = $path;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile picture updated successfully',
+            'profilePicture' => Storage::url($path)
+        ]);
     }
 
 }
