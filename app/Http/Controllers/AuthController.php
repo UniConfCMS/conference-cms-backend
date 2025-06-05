@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -13,13 +14,13 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'=>'required|email',
-            'password'=>'required'
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -28,11 +29,11 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
         $data = $user->toArray();
         $data['profilePicture'] = $user->profile_picture
-            ? url(\Storage::url($user->profile_picture))
+            ? url(Storage::url($user->profile_picture))
             : null;
         return response()->json([
-            'user'=>$data,
-            'token'=>$token,
+            'user' => $data,
+            'token' => $token,
         ]);
     }
 
@@ -41,7 +42,7 @@ class AuthController extends Controller
         $user = $request->user();
         $data = $user->toArray();
         $data['profilePicture'] = $user->profile_picture
-            ? url(\Storage::url($user->profile_picture))
+            ? url(Storage::url($user->profile_picture))
             : null;
         return response()->json($data);
     }
@@ -49,7 +50,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['message'=>'Logged out']);
+        return response()->json(['message' => 'Logged out']);
     }
 
     public function showSetPasswordForm(Request $request)
@@ -121,7 +122,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
         $data = $user->toArray();
         $data['profilePicture'] = $user->profile_picture
-            ? url(\Storage::url($user->profile_picture))
+            ? url(Storage::url($user->profile_picture))
             : null;
         return response()->json([
             'message' => 'Password set successfully',
