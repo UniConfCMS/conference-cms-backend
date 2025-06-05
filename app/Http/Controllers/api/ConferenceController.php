@@ -79,7 +79,7 @@ class ConferenceController extends Controller
             'conference' => $conference,
         ]);
     }
-    public function getConference(Request $request, $id)
+    public function getConference($id)
     {
         $conference = Conference::find($id);
 
